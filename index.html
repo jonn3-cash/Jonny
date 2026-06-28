@@ -993,7 +993,10 @@
       </div>
     </div>
 
-    <form class="contact-form reveal" style="transition-delay:.15s" id="contactForm">
+    <form class="contact-form reveal" style="transition-delay:.15s" id="contactForm" onsubmit="submitForm(event)">
+      <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
+      <input type="hidden" name="subject" value="New Estimate Request — Hiram Ceja Landscape" />
+      <input type="hidden" name="from_name" value="Hiram Ceja Landscape Website" />
       <div class="form-row">
         <div class="form-group">
           <label for="fname">First Name</label>
@@ -1094,12 +1097,30 @@
   }, { threshold: 0.12 });
   reveals.forEach(el => observer.observe(el));
 
-  // Contact form
-  document.getElementById('contactForm').addEventListener('submit', function(e) {
+  // Contact form — Web3Forms
+  async function submitForm(e) {
     e.preventDefault();
-    document.getElementById('formSuccess').style.display = 'block';
-    this.reset();
-  });
+    const btn = document.querySelector('.form-submit');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+
+    const data = new FormData(e.target);
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: data
+    });
+    const json = await res.json();
+
+    if (json.success) {
+      document.getElementById('formSuccess').style.display = 'block';
+      e.target.reset();
+      btn.textContent = 'Send Request';
+      btn.disabled = false;
+    } else {
+      btn.textContent = 'Error — Try Again';
+      btn.disabled = false;
+    }
+  }
 </script>
 </body>
 </html>
